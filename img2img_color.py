@@ -48,14 +48,24 @@ def main(opt):
     out_height = scale * char_height * num_rows
     out_image = Image.new("RGB", (out_width, out_height), bg_code)
     draw = ImageDraw.Draw(out_image)
-    for i in range(num_rows):
-        for j in range(num_cols):
+    
+    for i in range(num_rows):  # 遍历每一行
+        for j in range(num_cols):  # 遍历每一列
             partial_image = image[int(i * cell_height):min(int((i + 1) * cell_height), height),
                             int(j * cell_width):min(int((j + 1) * cell_width), width), :]
+            # 获取当前块的图像区域
+
             partial_avg_color = np.sum(np.sum(partial_image, axis=0), axis=0) / (cell_height * cell_width)
+            # 计算当前块的平均颜色
+
             partial_avg_color = tuple(partial_avg_color.astype(np.int32).tolist())
+            # 转换为整数的 RGB 颜色
+
             char = char_list[min(int(np.mean(partial_image) * num_chars / 255), num_chars - 1)]
+            # 根据灰度值选择字符
+
             draw.text((j * char_width, i * char_height), char, fill=partial_avg_color, font=font)
+            # 将字符绘制到输出图像上，使用平均颜色
 
     if opt.background == "white":
         cropped_image = ImageOps.invert(out_image).getbbox()
